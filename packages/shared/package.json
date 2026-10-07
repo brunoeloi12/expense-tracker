@@ -1,0 +1,14 @@
+{
+  "name": "@fincontrol/shared",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "zod": "^3.23.0"
+  },
+  "devDependencies": {
+    "@fincontrol/tsconfig": "workspace:*",
+    "typescript": "^5.0.0"
+  }
+}
