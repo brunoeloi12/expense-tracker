@@ -37,3 +37,26 @@ export type CreateCategoryInput = z.infer<typeof CreateCategorySchema>;
 
 export const UpdateCategorySchema = CreateCategorySchema.partial();
 export type UpdateCategoryInput = z.infer<typeof UpdateCategorySchema>;
+
+// Transaction Schemas
+export const CreateTransactionSchema = z.object({
+  accountId: z.string().uuid('ID de conta inválido'),
+  categoryId: z.string().uuid('ID de categoria inválido'),
+  type: TransactionTypeEnum,
+  amountCents: MoneySchema,
+  description: z.string().min(2, 'A descrição deve ter no mínimo 2 caracteres'),
+  occurredAt: z.coerce.date(),
+});
+export type CreateTransactionInput = z.infer<typeof CreateTransactionSchema>;
+
+export const UpdateTransactionSchema = CreateTransactionSchema.partial();
+export type UpdateTransactionInput = z.infer<typeof UpdateTransactionSchema>;
+
+// Shared Queries
+export const TransactionFiltersSchema = z.object({
+  accountId: z.string().uuid().optional(),
+  categoryId: z.string().uuid().optional(),
+  startDate: z.coerce.date().optional(),
+  endDate: z.coerce.date().optional(),
+});
+export type TransactionFiltersInput = z.infer<typeof TransactionFiltersSchema>;
