@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, UsePipes } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, UsePipes, Inject } from '@nestjs/common';
 import { CategoriesService } from './categories.service';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
@@ -8,7 +8,7 @@ import type { CreateCategoryInput, UpdateCategoryInput } from '@fincontrol/share
 @UseGuards(AuthGuard)
 @Controller('categories')
 export class CategoriesController {
-  constructor(private readonly categoriesService: CategoriesService) {}
+  constructor(@Inject(CategoriesService) private readonly categoriesService: CategoriesService) {}
 
   @Post()
   @UsePipes(new ZodValidationPipe(CreateCategorySchema))

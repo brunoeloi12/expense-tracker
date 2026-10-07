@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, UsePipes } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, UsePipes, Inject } from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
@@ -8,7 +8,7 @@ import type { CreateAccountInput, UpdateAccountInput } from '@fincontrol/shared'
 @UseGuards(AuthGuard)
 @Controller('accounts')
 export class AccountsController {
-  constructor(private readonly accountsService: AccountsService) {}
+  constructor(@Inject(AccountsService) private readonly accountsService: AccountsService) {}
 
   @Post()
   @UsePipes(new ZodValidationPipe(CreateAccountSchema))

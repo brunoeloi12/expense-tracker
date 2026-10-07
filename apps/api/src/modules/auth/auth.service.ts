@@ -4,12 +4,14 @@ import { PrismaService } from '../../infra/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
 import * as argon2 from 'argon2';
 
+import { Inject } from '@nestjs/common';
+
 @Injectable()
 export class AuthService {
   constructor(
-    private readonly usersService: UsersService,
-    private readonly prisma: PrismaService,
-    private readonly jwtService: JwtService,
+    @Inject(UsersService) private readonly usersService: UsersService,
+    @Inject(PrismaService) private readonly prisma: PrismaService,
+    @Inject(JwtService) private readonly jwtService: JwtService,
   ) {}
 
   async register(data: { email: string; passwordRaw: string; name: string }) {

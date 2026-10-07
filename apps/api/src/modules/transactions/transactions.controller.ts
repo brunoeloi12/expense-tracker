@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards, Req, Query, Sse, MessageEvent, UsePipes } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, UseGuards, Req, Query, Sse, MessageEvent, UsePipes, Inject } from '@nestjs/common';
 import { TransactionsService } from './transactions.service';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
@@ -11,8 +11,8 @@ import { RedisService } from '../../infra/redis/redis.service';
 @Controller('transactions')
 export class TransactionsController {
   constructor(
-    private readonly transactionsService: TransactionsService,
-    private readonly redis: RedisService,
+    @Inject(TransactionsService) private readonly transactionsService: TransactionsService,
+    @Inject(RedisService) private readonly redis: RedisService,
   ) {}
 
   @Sse('events')

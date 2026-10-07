@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, Inject } from '@nestjs/common';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { RedisService } from '../../infra/redis/redis.service';
 import type { CreateTransactionInput, UpdateTransactionInput, TransactionFiltersInput } from '@fincontrol/shared';
@@ -6,8 +6,8 @@ import type { CreateTransactionInput, UpdateTransactionInput, TransactionFilters
 @Injectable()
 export class TransactionsService {
   constructor(
-    private prisma: PrismaService,
-    private redis: RedisService,
+    @Inject(PrismaService) private prisma: PrismaService,
+    @Inject(RedisService) private redis: RedisService,
   ) {}
 
   private async invalidateBalanceCache(userId: string, accountId: string) {

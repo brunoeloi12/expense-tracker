@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, UsePipes } from '@nestjs/common';
+import { Controller, Post, Body, Res, UsePipes, Inject } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { FastifyReply } from 'fastify';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
@@ -7,7 +7,7 @@ import type { RegisterInput, LoginInput } from '@fincontrol/shared';
 
 @Controller('auth')
 export class AuthController {
-  constructor(private readonly authService: AuthService) {}
+  constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
   @Post('register')
   @UsePipes(new ZodValidationPipe(RegisterSchema))
