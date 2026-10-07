@@ -2,7 +2,8 @@ import { Controller, Post, Body, Res, UsePipes } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { FastifyReply } from 'fastify';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import { RegisterSchema, RegisterInput, LoginSchema, LoginInput } from '@fincontrol/shared';
+import { RegisterSchema, LoginSchema } from '@fincontrol/shared';
+import type { RegisterInput, LoginInput } from '@fincontrol/shared';
 
 @Controller('auth')
 export class AuthController {

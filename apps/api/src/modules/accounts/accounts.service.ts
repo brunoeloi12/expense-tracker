@@ -20,7 +20,7 @@ export class AccountsService {
     });
   }
 
-  async updateAccount(id: string, userId: string, data: { name: string }) {
+  async updateAccount(id: string, userId: string, data: { name?: string }) {
     return this.prisma.account.update({
       where: { id, userId },
       data,

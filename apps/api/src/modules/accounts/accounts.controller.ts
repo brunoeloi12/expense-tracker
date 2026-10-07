@@ -2,7 +2,8 @@ import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, UsePip
 import { AccountsService } from './accounts.service';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import { CreateAccountSchema, CreateAccountInput, UpdateAccountSchema, UpdateAccountInput } from '@fincontrol/shared';
+import { CreateAccountSchema, UpdateAccountSchema } from '@fincontrol/shared';
+import type { CreateAccountInput, UpdateAccountInput } from '@fincontrol/shared';
 
 @UseGuards(AuthGuard)
 @Controller('accounts')

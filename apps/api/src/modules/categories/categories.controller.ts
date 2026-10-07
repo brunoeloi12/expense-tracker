@@ -2,7 +2,8 @@ import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, UsePip
 import { CategoriesService } from './categories.service';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
-import { CreateCategorySchema, CreateCategoryInput, UpdateCategorySchema, UpdateCategoryInput } from '@fincontrol/shared';
+import { CreateCategorySchema, UpdateCategorySchema } from '@fincontrol/shared';
+import type { CreateCategoryInput, UpdateCategoryInput } from '@fincontrol/shared';
 
 @UseGuards(AuthGuard)
 @Controller('categories')
