@@ -65,12 +65,12 @@ flowchart TD
 
     UI --> ZOD
     API --> ZOD
-    UI -->|HTTP Requests| API
-    API -->|Persistência / Queries| PG
-    API -->|Invalidação & Eventos| REDIS
-    REDIS -->|Pub/Sub Message| SSE_Stream
-    SSE_Stream -->|HTTP Stream (text/event-stream)| SSE_Client
-    SSE_Client -->|Invalidate Queries| RQ
+    UI -->|"HTTP Requests"| API
+    API -->|"Persistência / Queries"| PG
+    API -->|"Invalidação & Eventos"| REDIS
+    REDIS -->|"Pub/Sub Message"| SSE_Stream
+    SSE_Stream -->|"Stream SSE (text/event-stream)"| SSE_Client
+    SSE_Client -->|"Invalidate Queries"| RQ
     RQ --> UI
 ```
 
