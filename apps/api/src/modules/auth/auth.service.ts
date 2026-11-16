@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { PrismaService } from '../../infra/prisma/prisma.service';
 import { JwtService } from '@nestjs/jwt';
@@ -15,18 +15,34 @@ export class AuthService {
   ) {}
 
   async register(data: { email: string; passwordRaw: string; name: string }) {
-    const passwordHash = await argon2.hash(data.passwordRaw);
-    const user = await this.usersService.create({
-      email: data.email,
-      name: data.name,
-      passwordHash,
-    });
-    return this.generateTokens(user.id);
+    try {
+      const passwordHash = await argon2.hash(data.passwordRaw, {
+        type: argon2.argon2id,
+        memoryCost: 65536,
+        timeCost: 3,
+        parallelism: 4,
+      });
+      const user = await this.usersService.create({
+        email: data.email.toLowerCase().trim(),
+        name: data.name.trim(),
+        passwordHash,
+      });
+      return await this.generateTokens(user.id);
+    } catch (error: any) {
+      if (error.code === 'P2002') {
+        throw new ConflictException('Email já está em uso');
+      }
+      throw error;
+    }
   }
 
   async login(data: { email: string; passwordRaw: string }) {
-    const user = await this.usersService.findByEmail(data.email);
+    const user = await this.usersService.findByEmail(data.email.toLowerCase().trim());
+
+    // Use constant-time comparison: always verify even if user not found
     if (!user) {
+      // Perform a dummy hash to prevent timing attacks
+      await argon2.hash(data.passwordRaw);
       throw new UnauthorizedException('Invalid credentials');
     }
 
@@ -39,8 +55,10 @@ export class AuthService {
   }
 
   private async generateTokens(userId: string) {
-    const accessToken = this.jwtService.sign({ sub: userId }, { expiresIn: '15m' });
-    const refreshToken = this.jwtService.sign({ sub: userId }, { expiresIn: '7d' });
+    const [accessToken, refreshToken] = await Promise.all([
+      this.jwtService.signAsync({ sub: userId, type: 'access' }, { expiresIn: '15m' }),
+      this.jwtService.signAsync({ sub: userId, type: 'refresh' }, { expiresIn: '7d' }),
+    ]);
 
     const refreshTokenHash = await argon2.hash(refreshToken);
     const expiresAt = new Date();

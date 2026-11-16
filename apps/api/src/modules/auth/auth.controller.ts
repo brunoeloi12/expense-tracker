@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Res, UsePipes, Inject } from '@nestjs/common';
+import { Controller, Post, Body, Res, UsePipes, Inject, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import type { FastifyReply } from 'fastify';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
@@ -10,6 +10,7 @@ export class AuthController {
   constructor(@Inject(AuthService) private readonly authService: AuthService) {}
 
   @Post('register')
+  @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ZodValidationPipe(RegisterSchema))
   async register(@Body() body: RegisterInput, @Res({ passthrough: true }) res: FastifyReply) {
     const { accessToken, refreshToken } = await this.authService.register({
@@ -23,6 +24,7 @@ export class AuthController {
   }
 
   @Post('login')
+  @HttpCode(HttpStatus.OK)
   @UsePipes(new ZodValidationPipe(LoginSchema))
   async login(@Body() body: LoginInput, @Res({ passthrough: true }) res: FastifyReply) {
     const { accessToken, refreshToken } = await this.authService.login({
@@ -34,20 +36,30 @@ export class AuthController {
     return { success: true };
   }
 
+  @Post('logout')
+  @HttpCode(HttpStatus.OK)
+  async logout(@Res({ passthrough: true }) res: FastifyReply) {
+    res.clearCookie('accessToken', { path: '/' });
+    res.clearCookie('refreshToken', { path: '/' });
+    return { success: true };
+  }
+
   private setCookies(res: FastifyReply, accessToken: string, refreshToken: string) {
+    const isProduction = process.env.NODE_ENV === 'production';
+
     res.setCookie('accessToken', accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
       path: '/',
       maxAge: 15 * 60, // 15 minutes
     });
 
     res.setCookie('refreshToken', refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
+      secure: isProduction,
+      sameSite: isProduction ? 'strict' : 'lax',
+      path: '/auth/refresh', // Restrict refresh token path
       maxAge: 7 * 24 * 60 * 60, // 7 days
     });
   }

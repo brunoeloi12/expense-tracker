@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, UsePipes, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Body, Param, UseGuards, Req, UsePipes, Inject, ParseUUIDPipe } from '@nestjs/common';
 import { AccountsService } from './accounts.service';
 import { AuthGuard } from '../../common/guards/auth.guard';
 import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe';
@@ -22,13 +22,19 @@ export class AccountsController {
   }
 
   @Put(':id')
-  @UsePipes(new ZodValidationPipe(UpdateAccountSchema))
-  async updateAccount(@Req() req: any, @Param('id') id: string, @Body() body: UpdateAccountInput) {
+  async updateAccount(
+    @Req() req: any,
+    @Param('id', new ParseUUIDPipe({ version: '7' })) id: string,
+    @Body(new ZodValidationPipe(UpdateAccountSchema)) body: UpdateAccountInput,
+  ) {
     return this.accountsService.updateAccount(id, req.user.id, { name: body.name });
   }
 
   @Delete(':id')
-  async deleteAccount(@Req() req: any, @Param('id') id: string) {
+  async deleteAccount(
+    @Req() req: any,
+    @Param('id', new ParseUUIDPipe({ version: '7' })) id: string,
+  ) {
     return this.accountsService.deleteAccount(id, req.user.id);
   }
 }

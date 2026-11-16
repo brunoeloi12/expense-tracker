@@ -13,12 +13,25 @@ export class AuthGuard implements CanActivate {
       throw new UnauthorizedException('No token provided');
     }
 
+    const jwtSecret = process.env.JWT_SECRET;
+    if (!jwtSecret) {
+      throw new Error('JWT_SECRET environment variable is required');
+    }
+
     try {
       const payload = await this.jwtService.verifyAsync(token, {
-        secret: process.env.JWT_SECRET || 'secretKey',
+        secret: jwtSecret,
+        algorithms: ['HS256'],
       });
+
+      // Validate payload has required fields
+      if (!payload.sub || typeof payload.sub !== 'string') {
+        throw new UnauthorizedException('Invalid token payload');
+      }
+
       request['user'] = { id: payload.sub };
-    } catch {
+    } catch (error) {
+      if (error instanceof UnauthorizedException) throw error;
       throw new UnauthorizedException('Invalid token');
     }
 
